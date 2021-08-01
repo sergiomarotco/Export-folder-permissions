@@ -16,15 +16,15 @@ namespace FolderRules
             InitializeComponent();
             lvwColumnSorter = new ListViewColumnSorter();
             this.listView1.ListViewItemSorter = lvwColumnSorter;
-            systemusers = richTextBox1.Text.Split('\n');
+            systemusers = richTextBox1.Text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             textBox1.Text = Properties.Settings.Default.DefaultDirectory;
             textBox2.Text = Properties.Settings.Default.scan_dept.ToString();
             richTextBox1.Text = Properties.Settings.Default.System_folders;
             richTextBox2.Text = Properties.Settings.Default.System_users;
 
-            systemfolders = richTextBox1.Text.Split('\n');
-            systemusers = richTextBox2.Text.Split('\n');
+            systemfolders = richTextBox1.Text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            systemusers = richTextBox2.Text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
         }
         string[] systemfolders;
         /// <summary>
@@ -82,47 +82,59 @@ namespace FolderRules
                     {
                         foreach (FileSystemAccessRule ACL in ACLs)
                         {
-                            string[] rights = ACL.FileSystemRights.ToString().Split(',');
-                            if (ACL.AccessControlType.ToString().Equals("Allow"))
+                            string[] rights_Temp = ACL.FileSystemRights.ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string right_Temp in rights_Temp)
                             {
-                                foreach (string right in rights)
+                                try
                                 {
+                                    string ACL_string = ACL.IdentityReference.ToString();
+                                    string right = right_Temp.Trim();//ос
+                                    switch (right_Temp)//Печатаем большими буквами чтобы визуально отличать,, но при сортировке и фильтре чтобы не отличалось
+                                    {
+                                        case "268435456":
+                                            right = "FULLCONTROLL";
+                                            break;
+                                        case "-536805376":
+                                            right = "EXECUTE";
+                                            break;
+                                        case "-1073741824":
+                                            right = "WRITE";
+                                            break;
+                                        case "2147483648":
+                                            right = "READ";
+                                            break;
+                                        case "-1610612736"://https://coderoad.ru/26427967/Get-acl-%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D1%8F%D1%8E%D1%89%D0%B8%D0%B5%D1%81%D1%8F-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B-Powershell
+                                            right = "READANDEXECUTE";
+                                            try
+                                            {
+                                                if (ACL.AccessControlType.ToString().Equals("Allow"))
+                                                {
+                                                    Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL_string, "SYNCHRONIZE", String.Empty, ACL.InheritanceFlags.ToString(), ACL.IsInherited.ToString() })); });
+                                                }
+                                                if (ACL.AccessControlType.ToString().Equals("Deny"))
+                                                {
+                                                    Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL_string, String.Empty, "SYNCHRONIZE", ACL.InheritanceFlags.ToString(), ACL.IsInherited.ToString() })); });
+                                                }
+                                            }
+                                            catch (Exception EE) { MessageBox.Show("1\n" + EE.Message); }
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                     try
                                     {
-                                        string ACL_string = ACL.IdentityReference.ToString();
-                                        string right_TTT = right.Trim();
-                                        switch (right)
+                                        if (ACL.AccessControlType.ToString().Equals("Allow"))
                                         {
-                                            case "268435456":
-                                                right_TTT = "FULLCONTROLL";
-                                                break;
-                                            case "-536805376":
-                                                right_TTT = "EXECUTE";
-                                                break;
-                                            case "-1073741824":
-                                                right_TTT = "WRITE";
-                                                break;
-                                            case "2147483648":
-                                                right_TTT = "READ";
-                                                break;
-                                            case "-1610612736"://https://coderoad.ru/26427967/Get-acl-%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D1%8F%D1%8E%D1%89%D0%B8%D0%B5%D1%81%D1%8F-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B-Powershell
-                                                right_TTT = "READANDEXECUTE";
-                                                Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL_string, "SYNCHRONIZE", String.Empty })); });
-                                                break;
-                                            default:
-                                                break;
+                                            Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL_string, right, String.Empty, ACL.InheritanceFlags.ToString(), ACL.IsInherited.ToString() })); });
                                         }
-                                        Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL_string, right_TTT, String.Empty })); });
+                                        if (ACL.AccessControlType.ToString().Equals("Deny"))
+                                        {
+                                            Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL.IdentityReference.ToString(), String.Empty, right, ACL.InheritanceFlags.ToString(), ACL.IsInherited.ToString() })); });
+                                        }
                                     }
-                                    catch { }
+                                    catch (Exception EE) { MessageBox.Show("2\n" + EE.Message); }
                                 }
-                            }
-                            else if (ACL.AccessControlType.ToString().Equals("Deny"))
-                            {
-                                foreach (string right in rights)
-                                {
-                                    Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { RootDirectory, ACL.IdentityReference.ToString(), String.Empty, right })); });
-                                }
+                                catch (Exception EE) { MessageBox.Show("3\n" + EE.Message); }
                             }
                         }
                     }
@@ -141,9 +153,8 @@ namespace FolderRules
                                 }
                             }
                         }
-                    string[] Tree = root.FullName.Split('\\');
-                    
-                    if (Tree.Length < Convert.ToInt32(Properties.Settings.Default.scan_dept) + 1)
+                    List<string> Tree = new List<string>(root.FullName.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries));              
+                    if (Tree.Count < Convert.ToInt32(Properties.Settings.Default.scan_dept))
                     {
                         foreach (DirectoryInfo dirInfo in subDirs)
                         {
@@ -156,7 +167,10 @@ namespace FolderRules
                 {
                     MessageBox.Show("The folder does not exist. Canceling an operation.");
                 }
-                Invoke((ThreadStart)delegate { listView1.Refresh(); });
+                try
+                {
+                    Invoke((ThreadStart)delegate { listView1.Refresh(); });
+                }catch(Exception EE) { MessageBox.Show("5\n" + EE.Message); }
             }
         }
         /// <summary>
@@ -204,16 +218,10 @@ namespace FolderRules
         private void Button2_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
-            DialogResult result = fbd.ShowDialog();
             if (!string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
                 textBox1.Text = fbd.SelectedPath;
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void TextBox1_TextChanged(object sender, EventArgs e)
@@ -230,13 +238,13 @@ namespace FolderRules
 
         private bool allow_work = false;
 
-        private void linkLabel1_LinkClicked_1(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            string s = listView1.Items[listView1.SelectedIndices[1]].Text;
-            //System.Diagnostics.Process.Start("explorer", listView1.Items[listView1.SelectedIndices[1]].);
-        }
         private ListViewColumnSorter lvwColumnSorter;
-        private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
+        /// <summary>
+        /// Отсортировать по Listview при нажатии на заголовок столба
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListView1_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             //https://docs.microsoft.com/ru-ru/troubleshoot/dotnet/csharp/sort-listview-by-column
             // Determine if clicked column is already the column that is being sorted.
@@ -260,10 +268,10 @@ namespace FolderRules
             }
 
             // Perform the sort with these new sort options.
-            this.listView1.Sort();
+            listView1.Sort();
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void Button4_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.System_folders = richTextBox1.Text;
             Properties.Settings.Default.System_users = richTextBox2.Text;
@@ -281,9 +289,28 @@ namespace FolderRules
             Properties.Settings.Default.Reload();
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void TextBox2_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void ListView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                DirectoryInfo DI = new DirectoryInfo(listView1.SelectedItems[0].SubItems[0].Text);
+                if (DI.Exists)
+                {
+                    try
+                    {
+                        if (!DI.Attributes.ToString().Contains("ReparsePoint"))//проверка возможности доступа
+                        {
+                            Process.Start("explorer", listView1.SelectedItems[0].SubItems[0].Text);
+                        }
+                    }
+                    catch { }
+                }
+            }
         }
     }
 }
