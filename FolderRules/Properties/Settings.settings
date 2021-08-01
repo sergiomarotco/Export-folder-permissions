@@ -3,7 +3,27 @@
   <Profiles />
   <Settings>
     <Setting Name="DefaultDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\1Test</Value>
+      <Value Profile="(Default)">C:\</Value>
+    </Setting>
+    <Setting Name="System_folders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">$Recycle.Bin
+System Volume Information
+GAG_MSIL
+</Value>
+    </Setting>
+    <Setting Name="System_users" Type="System.String" Scope="User">
+      <Value Profile="(Default)">СОЗДАТЕЛЬ-ВЛАДЕЛЕЦ
+BUILTIN
+NT AUTHORITY</Value>
+    </Setting>
+    <Setting Name="Ignore_system_directories" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Ignore_system_users" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="scan_dept" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
