@@ -300,7 +300,10 @@ namespace FolderRules
             }
         }
 
-
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.Icon = Properties.Resources.icons18;
+        }
     }
     class ListItem_my
     {
