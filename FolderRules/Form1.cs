@@ -37,41 +37,16 @@ namespace FolderRules
             button3.Visible = true;
             button1.Enabled = false;
             listView1.Items.Clear();
-            Real_list.Clear();
             root_layer = textBox1.Text.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Length;
             Task.Factory.StartNew(() => Main_Task(textBox1.Text));
         }
         int root_layer = 0;
-        List<ListItem_my> Real_list = new List<ListItem_my>(0);
+
         private void Main_Task(string RootDirectory)
         {
-            Invoke((ThreadStart)delegate{listView1.Visible = false;});
+            Invoke((ThreadStart)delegate{listView1.Visible = false;});// сокрытие, отрисовка тормозит работу
             WalkDirectoryTree(RootDirectory);
-            List<ListViewItem> L = new List<ListViewItem>(0);
-            for (int i = 0; i < Real_list.Count; i++)
-            {
-                try
-                {
-                    Invoke((ThreadStart)delegate
-                    {
-                        ListViewItem dfsadfsd = new ListViewItem(Real_list[i].one_item);
-                        //dfsadfsd.SubItems[0].Text = dfsadfsd.SubItems[0].Text.Replace(@"\", ".");
-                        //dfsadfsd.SubItems[1].Text = "1";
-                        //dfsadfsd.SubItems[2].Text = "2";
-                        //dfsadfsd.SubItems[3].Text = "3";
-                        //dfsadfsd.SubItems[4].Text = "4";
-                        //dfsadfsd.SubItems[5].Text = "5";
-                        listView1.Items.Add(dfsadfsd);
-                    });
-                }
-                catch (Exception ee)
-                {
-                    MessageBox.Show(ee.Message);
-                }
-            }
-
             MessageBox.Show("Done");
-
             Invoke((ThreadStart)delegate
             {
                 button1.Enabled = true;
@@ -136,20 +111,10 @@ namespace FolderRules
                                     case "-1610612736"://https://coderoad.ru/26427967/Get-acl-%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D1%8F%D1%8E%D1%89%D0%B8%D0%B5%D1%81%D1%8F-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B-Powershell
                                         right = "READANDEXECUTE";
 
-                                        if (ACL.AccessControlType.ToString().Equals("Allow"))
-                                        {
-                                            //Invoke((ThreadStart)delegate{richTextBox3.Text += directory + ";" + ACL_string + ";" + "SYNCHRONIZE" + ";" + string.Empty + ";" + ACL_IF + ";" + ACL_IsI + Environment.NewLine;});
-                                            Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, "SYNCHRONIZE", string.Empty, ACL_IF, ACL_IsI })); });
-                                            //Invoke((ThreadStart)delegate { Real_list.Add(new ListItem_my(new string[] { directory, ACL_string, "SYNCHRONIZE", String.Empty, ACL_IF, ACL_IsI })); });
-                                            //Invoke((ThreadStart)delegate { listView1.Refresh(); });
-                                        }
-                                        if (ACL.AccessControlType.ToString().Equals("Deny"))
-                                        {
-                                            //Invoke((ThreadStart)delegate{richTextBox3.Text += directory + ";" + ACL_string + ";" + string.Empty + ";" + "SYNCHRONIZE" + ";" + ACL_IF + ";" + ACL_IsI + Environment.NewLine;});
-                                            Invoke((ThreadStart)delegate{listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, string.Empty, "SYNCHRONIZE", ACL_IF, ACL_IsI }));});
-                                            //Invoke((ThreadStart)delegate { Real_list.Add(new ListItem_my(new string[] { directory, ACL_string, String.Empty, "SYNCHRONIZE", ACL_IF, ACL_IsI })); });
-                                            //Invoke((ThreadStart)delegate { listView1.Refresh(); });                                            
-                                        }
+                                        if (ACL.AccessControlType.ToString().Equals("Allow"))                                        
+                                            Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, "SYNCHRONIZE", string.Empty, ACL_IF, ACL_IsI })); });                                        
+                                        if (ACL.AccessControlType.ToString().Equals("Deny"))                                        
+                                            Invoke((ThreadStart)delegate{listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, string.Empty, "SYNCHRONIZE", ACL_IF, ACL_IsI }));});                                                                             
                                         break;
                                     default:
                                         break;
@@ -157,19 +122,9 @@ namespace FolderRules
                                 try
                                 {
                                     if (ACL.AccessControlType.ToString().Equals("Allow"))
-                                    {
-                                        //Invoke((ThreadStart)delegate{richTextBox3.Text += directory + ";" + ACL_string + ";" + right + ";" + string.Empty + ";" + ACL_IF + ";" + ACL_IsI + Environment.NewLine;});
                                         Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, right, string.Empty, ACL_IF, ACL_IsI })); });
-                                        //Invoke((ThreadStart)delegate { Real_list.Add(new ListItem_my(new string[] { directory, ACL_string, right, String.Empty, ACL_IF, ACL_IsI })); });
-                                        //Invoke((ThreadStart)delegate { listView1.Refresh(); });
-                                    }
                                     if (ACL.AccessControlType.ToString().Equals("Deny"))
-                                    {
-                                        //Invoke((ThreadStart)delegate{richTextBox3.Text += directory + ";" + ACL_string + ";" + string.Empty + ";" + right + ";" + ACL_IF + ";" + ACL_IsI + Environment.NewLine;});
-                                        Invoke((ThreadStart)delegate {listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, string.Empty, right, ACL_IF, ACL_IsI })); });
-                                        //Invoke((ThreadStart)delegate { Real_list.Add(new ListItem_my(new string[] { directory, ACL_string, String.Empty, right, ACL_IF, ACL_IsI })); });
-                                        //Invoke((ThreadStart)delegate { listView1.Refresh(); });
-                                    }
+                                        Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, ACL_string, string.Empty, right, ACL_IF, ACL_IsI })); });
                                 }
                                 catch (UnauthorizedAccessException ee) { MessageBox.Show(ee.StackTrace); }
                                 catch (Exception ee) { MessageBox.Show(ee.StackTrace); }
@@ -203,7 +158,7 @@ namespace FolderRules
                                 if (allow_work)
                                     WalkDirectoryTree(dirInfo.FullName);
                     }
-                    catch { Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, "Acceess denied", string.Empty, string.Empty, string.Empty, string.Empty })); }); }
+                    catch { Invoke((ThreadStart)delegate { listView1.Items.Add(new ListViewItem(new string[] { directory, "Failed to get subfolders list. Acceess denied!?", string.Empty, string.Empty, string.Empty, string.Empty })); }); }
                 }
                 else
                 {
@@ -254,11 +209,6 @@ namespace FolderRules
         }
 
         private bool allow_work = false;
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-
-        }
 
         private void ListView1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -350,10 +300,7 @@ namespace FolderRules
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
 
-        }
     }
     class ListItem_my
     {
