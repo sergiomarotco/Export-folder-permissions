@@ -37,7 +37,7 @@ namespace FolderRules.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("$Recycle.Bin\r\nSystem Volume Information\r\nGAG_MSIL\r\n")]
+        [global::System.Configuration.DefaultSettingValueAttribute("$Recycle.Bin\r\nSystem Volume Information\r\nGAG_MSIL\r\nMSOCache")]
         public string System_folders {
             get {
                 return ((string)(this["System_folders"]));
@@ -56,41 +56,6 @@ namespace FolderRules.Properties {
             }
             set {
                 this["System_users"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Ignore_system_directories {
-            get {
-                return ((bool)(this["Ignore_system_directories"]));
-            }
-            set {
-                this["Ignore_system_directories"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Ignore_system_users {
-            get {
-                return ((bool)(this["Ignore_system_users"]));
-            }
-            set {
-                this["Ignore_system_users"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int scan_dept {
-            get {
-                return ((int)(this["scan_dept"]));
-            }
-            set {
-                this["scan_dept"] = value;
             }
         }
     }
